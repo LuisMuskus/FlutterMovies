@@ -44,7 +44,7 @@ class _MoviePoster extends StatelessWidget {
             width: 130,
             height: 190,
             //color: Colors.green,
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            margin:  EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             child: Column(
               children: [
 
@@ -52,7 +52,7 @@ class _MoviePoster extends StatelessWidget {
                   onTap: () => Navigator.popAndPushNamed(context, 'details', arguments: 'movie-instance'),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: const FadeInImage(
+                    child:  FadeInImage(
                       placeholder: AssetImage('assets/no-image.jpg'),
                       image: NetworkImage('http://via.placeholder.com/300x400'),
                       width: 130,
