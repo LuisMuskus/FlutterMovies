@@ -32,7 +32,13 @@ class HomeScreen extends StatelessWidget {
           CardSwiper( movies: moviesProvider.onDisplayMovies ),
 
           // Slider de peliculas
-          MovieSlider(),
+          MovieSlider(
+            movies: moviesProvider.popularMovies,
+            title: 'Populares',
+           // onNextPage: () => print('Hola mundo'), Cuando este lleagndo el scrol a -500 lanzara el mensaje de prueba
+           onNextPage: () => moviesProvider.getPopularMovies(),
+
+          ),
 
         ],
       )
