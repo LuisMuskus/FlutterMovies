@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:peliculas/models/models.dart';
+import 'package:peliculas/models/search_response.dart';
 
 
 class MoviesProvider extends ChangeNotifier {
@@ -13,6 +14,9 @@ class MoviesProvider extends ChangeNotifier {
 
   List<Movie> onDisplayMovies = [];
   List<Movie> popularMovies = [];
+
+  Map<int, List<Cast>> moviesCast ={};
+
   int _popularPage = 0;
 
   MoviesProvider(){
@@ -25,7 +29,7 @@ class MoviesProvider extends ChangeNotifier {
 
     Future<String> _getJsonData(String endpoint, [int page= 1]) async{
 
-     var url =
+     final url =
       Uri.https(_baseUrl, endpoint, {
         'api_key':_apiKey,
         'language': _language,
@@ -63,4 +67,44 @@ class MoviesProvider extends ChangeNotifier {
       notifyListeners(); // Notifica a los widgets cuando hay cambios
 
   }
+
+  Future<List<Cast>> getMoviesCast( int movieId ) async{
+
+    //TODO: Revisar el mapa, se coloca un if para validar q exista el movieId y no vuelva a hacer una peticion, debe quedar en memoria
+
+    if ( moviesCast.containsKey(movieId)) return moviesCast[movieId]!; 
+    // se escirbe ! para exponerle a dart q simepre va venir un id
+
+    
+
+    print("pidiendo info al servidor - Cast");
+
+    final jsonData= await this._getJsonData('3/movie/$movieId/credits');
+    final creditsResponse = CreditsResponse.fromJson(jsonData);
+
+    moviesCast[movieId] = creditsResponse.cast;
+
+    return creditsResponse.cast;
+
+  }
+
+
+  Future<List<Movie>> searchMovies(String query) async{
+
+    final url =
+      Uri.https(_baseUrl, '3/search/movie', {
+        'api_key':_apiKey,
+        'language': _language,
+        'query': query
+      });
+    final  response = await http.get(url);
+     //print(response.body);
+    final searchResponse = SearchResponse.fromJson(response.body) ;
+
+    return searchResponse.results ;
+
+
+  }
+
+
 }
