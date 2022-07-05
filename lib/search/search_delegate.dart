@@ -38,7 +38,32 @@ class MovieSerachDelegate extends SearchDelegate{
   @override
   Widget buildResults(BuildContext context) {
     // TODO: implement buildResults
-    throw UnimplementedError();
+    //return Text('buildResults');
+
+    if (query.isEmpty) {
+      return _empyContainer();
+    }
+
+    final moviesProvider = Provider.of<MoviesProvider>(context, listen: false);
+    moviesProvider.getsuggestionByQuery( query);
+
+    return StreamBuilder(
+      stream: moviesProvider.suggestionStream,
+      builder: ( _ , AsyncSnapshot<List<Movie>> snapshot) {
+        if ( !snapshot.hasData) return  _empyContainer();
+
+        final movies =  snapshot.data!;
+
+        return ListView.builder(
+                itemCount: movies.length,
+                itemBuilder:( _ , int index) =>  _MovieItem( movies[index])
+               );
+      },
+    );
+
+
+
+
   }
 
   Widget _empyContainer(){
@@ -59,9 +84,10 @@ class MovieSerachDelegate extends SearchDelegate{
     }
 
     final moviesProvider = Provider.of<MoviesProvider>(context, listen: false);
+    moviesProvider.getsuggestionByQuery( query);
 
-    return FutureBuilder(
-      future: moviesProvider.searchMovies(query),
+    return StreamBuilder(
+      stream: moviesProvider.suggestionStream,
       builder: ( _ , AsyncSnapshot<List<Movie>> snapshot) {
         if ( !snapshot.hasData) return  _empyContainer();
 
@@ -86,12 +112,18 @@ class _MovieItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    movie.heroId = 'search-${ movie.id}';
+
     return ListTile(
-      leading: FadeInImage(
-        placeholder: AssetImage('assets/no-image.jpg'),
-        image: NetworkImage(movie.fullPosterImg),
-        width: 50,
-        fit: BoxFit.contain,
+      leading: Hero(
+        tag: movie.heroId!,
+        child: FadeInImage(
+          placeholder: AssetImage('assets/no-image.jpg'),
+          image: NetworkImage(movie.fullPosterImg),
+          width: 50,
+          fit: BoxFit.contain,
+        ),
       ),
       title: Text(movie.title),
       subtitle: Text (movie.originalTitle),
